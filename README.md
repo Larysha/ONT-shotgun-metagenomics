@@ -21,6 +21,6 @@ This project uses a combination of free, third party tools - assuming data base-
 9. `quast.sh`
 10. `busco.sh`
 
-The `config.sh` file is an optional file that sets the the working directory paths to specific variables - if you load it once, then the working directory can be changed easily throughout a working session
+The `config.sh` file is an optional file that sets the working directory paths to specific variables. Loading it will enable the working directory to be changed easily throughout a working session
 Please adjust it to suit your file system.
 

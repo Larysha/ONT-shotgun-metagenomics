@@ -22,4 +22,4 @@ NPROC=$(nproc)
 BASECALLS=all.fastq
 DRAFT=consensus.fasta
 OUTDIR=medaka_consensus
-medaka_consensus -i ${BASECALLS} -d ${DRAFT} -o ${OUTDIR} -t ${NPROC} -m r941_min_high_g303
+medaka_consensus -i ${BASECALLS} -d ${DRAFT} -o ${OUTDIR} -t ${NPROC} -m r941_min_fast_g507

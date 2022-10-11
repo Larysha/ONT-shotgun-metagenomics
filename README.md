@@ -13,12 +13,12 @@ This project uses a combination of free, third party tools - assuming data base-
 1. `config.sh`
 2. `data_download.sh`
 3. `longqc.sh`
-4. `medaka.sh`
-5. `fastq_to_fasta`
-6. `classify.sh`
-7. `krona.sh`
-8. `metaflye.sh`
-9. `quast.sh`
+4. `fastq_to_fasta`
+5. `classify.sh`
+6. `krona.sh`
+7. `metaflye.sh`
+8. `quast.sh`
+9. `medaka.sh`
 10. `busco.sh`
 
 The `config.sh` file is an optional file that sets the working directory paths to specific variables. Loading it will enable the working directory to be changed easily throughout a working session

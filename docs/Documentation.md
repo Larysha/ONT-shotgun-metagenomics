@@ -1,12 +1,15 @@
-# Documentation 
+# Shotgun Metagenomics Analysis with ONT Sequencing: Pipeline Documentation 
 
-Shotgun metagenomics includes sequencing all genomic DNA from an environmental sample (e.g., a water sample) , which means it contains mixed populations that are sequenced in parallel. The genomes may be different sizes and mixed with host DNA. 
-ONT technology can span mega-bases in a single read and these longer reads are a major benefit. High molecular weight DNA (HMW) is often used in ONT, but there is a trade-off between read length and yield.  Inputs include ds DNA, cDNA (with optional amplification) or direct RNA.
-ONT limitations include higher error rates and relatively high amounts of nucleic acid is required. Its principal strength remains the ultra long read length, which is especially useful in assembly. It also allows for the sequencing of a single, native molecule (no PCR bias).
+Shotgun metagenomics includes sequencing all genomic DNA from an environmental sample (e.g., a water or soil sample) , which means it contains DNA from mixed populations that is sequenced in parallel. In addition, the genomes may differ in size and be mixed with DNA from microbial host cells. \
+Oxford Nanopore Technology (ONT) sequencing can span mega-bases in a single read, which helps to reduce uncertainty when sorting and assigning DNA fragments to a particular genome in a metagenomic sample. High molecular weight DNA (HMW) is often used in ONT, but there is a trade-off between read length and yield.  Input requirements include either double stranded DNA or dsDNA, complementary DNA or cDNA (with optional amplification) or direct RNA.
+ONT limitations include higher error rates and relatively high amounts of nucleic acid. Its principal strength remains the ultra long read length, which is especially useful in assembly. It also allows for the sequencing of a single, native molecule (no PCR bias).
 
 This project includes scripts for a typical shotgun metagenomics downstream analysis pipeline using ONT reads.
 
+<br/>
+
 ## Scripts (in order of pipeline):
+<br/>
 
 1. `config.sh`
 2. `data_download.sh`
@@ -19,17 +22,25 @@ This project includes scripts for a typical shotgun metagenomics downstream anal
 9. `medaka.sh`
 10. `busco.sh`
 
+<br/>
+
+
 The `config.sh` file is an optional file that sets the the working directory paths to specific variables - if you load it once, then the working directory can be changed easily throughout a working session
+
+<br/>
 
 ## Data Acquisition with sra-toolkit
 
 *Optional*
 
-To test this pipeline, all data was downloaded from the NCBI SRA database using the `sra-toolkit V. 2.10.9`. This included two runs  (SRR9648445 and SRR9648446) prepared using 1D Rapid PCR Barcoding Kit (SQK-RPK004), sequenced with MinION device with FLO-MIN106 (R9.4) flowcell.
+To test this pipeline, all data was downloaded from the NCBI SRA database using the `sra-toolkit V. 2.10.9`. This included two runs  (SRR9648445 and SRR9648446) prepared using the 1D Rapid PCR Barcoding Kit (SQK-RPK004), sequenced with MinION device with FLO-MIN106 (R9.4) flowcell.
 
-The samples have been base-called, demultiplexed and the adaptors have been trimmed with `ONT-Guppy`  - propriety software from ONT and built into the miniKNOW platform to run in real-time during sequencing. 
+The samples have been base-called, demultiplexed and the adaptors have been trimmed with `ONT-Guppy`  - propriety software from ONT that is built into the miniKNOW platform to run in real-time during sequencing.
 
-To download: for large datasets in SRA format, `prefecth` can be used 
+<br/>
+<br/>
+
+To download: for large datasets in SRA format, `prefetch` can be used 
 
 ```bash
 $ prefetch  SRR9648445  # for a single file
@@ -42,11 +53,13 @@ $ prefetch SRR.txt # for multiple SRR files recorded in a text file
 If you want to download a file directly in `fastq` format, the `prefetch` step is unnecessary and multiple files can be downloaded using this loop:
 
 ```bash
-for ((i=45; i<=46; i++)) #adjust the values of i accordingly
+for ((i=45; i<=46; i++)) # adjust the values of i accordingly
     do
     fastrq-dump --accession SRR96484$i  # adjust the SRR ID accordingly
 done
 ```
+<br/>
+<br/>
 
 ## Quality control with LongQC
 
@@ -64,11 +77,14 @@ outfq=/path/to/output/files
 
 ```
 
-You can now run the `longQC.sh` script. Note that the `ont-rapid` argument is set in this script - change to `ont-ligation` for PCR-free samples. Also adjust the SRR variable to suit your files.
+You can now run the `longQC.sh` script and find the output of the analysis in the `outfq` directory. Note that the `ont-rapid` argument is set in this script - change to `ont-ligation` for PCR-free samples. Also adjust the SRR variable to suit the identification numbers of your files. 
+
+<br/>
+<br/>
 
 ## Taxonomic classification with Kraken2
 
-Kraken is a taxonomic sequence classifier that assigns taxonomic labels to DNA sequences by examining k-mers within a query sequence to compare to a database and map the k-mers to the lowest common ancestor. Kraken2 is on the CHPC server but if you are using your local device, note that construction of the Kraken2 standard database requires ~ 100GB of disk space. You can also create your own own custom database, should the need arise. Installation and set up of the database instructions can be found here: [https://github.com/DerrickWood/kraken2/wiki/Manual#special-databases](https://github.com/DerrickWood/kraken2/wiki/Manual#special-databases)
+Kraken is a taxonomic sequence classifier that assigns taxonomic labels to DNA sequences by examining k-mers within a query sequence to compare to a database and map the k-mers to the lowest common ancestor. Kraken2 is available on the CHPC server but if you are using your local device, note that construction of the Kraken2 standard database requires ~ 100GB of disk space. You can also create your own own custom database. Installation and set up of the database instructions can be found here: [https://github.com/DerrickWood/kraken2/wiki/Manual#special-databases](https://github.com/DerrickWood/kraken2/wiki/Manual#special-databases)
 
 ### First, convert the `fastq` files to `fasta` format:
 
@@ -83,6 +99,9 @@ wkdir=/path/to/working/dir
 ```
 
 You can now run the script `[classify.sh](http://classify.sh)`  It is recommended to run the script with the `- -report` option and without it, to generate two outputs:
+
+<br/>
+
 
 **The default is kraken standard output, which contains five tab-delimited fields:**
 
@@ -105,6 +124,10 @@ You can now run the script `[classify.sh](http://classify.sh)`  It is recommende
 4. A rank code, indicating (U)nclassified, (R)oot, (D)omain, (K)ingdom, (P)hylum, (C)lass, (O)rder, (F)amily, (G)enus, or (S)pecies. Taxa that are not at any of these 10 ranks have a rank code that is formed by using the rank code of the closest ancestor rank with a number indicating the distance from that rank. E.g., "G2" is a rank code indicating a taxon is between genus and species and the grandparent taxon is at the genus rank.
 5. NCBI taxonomic ID number
 6. Indented scientific name
+
+<br/>
+<br/>
+
 
 ## Visualization with Krona
 
@@ -145,15 +168,23 @@ ktImportTaxonomy 45_C.krona
 firefox taxonomy.krona.html
 ```
 
+<br/>
+<br/>
+
+
 ## Metagenome Assembly with MetaFlye
 
 `Flye` is recommended by ONT for *de novo* genome assembly - it has a metagenome assembly mode for non-uniform coverage and higher repeat content, assigned with the option `--meta` The alternative tool, `Canu`, has a slightly lower error rate but it is much more time intensive.
 
 The script [`metaflye.sh`](http://metaflye.sh) works for all `.fastq` files in the `wkdir` - adjust this variable in the script to your own working directory path. The option `--nano-corr` has been set in this script for error corrected ONT reads but can be changed - refer to docs: [https://github.com/fenderglass/Flye/blob/flye/docs/USAGE.md](https://github.com/fenderglass/Flye/blob/flye/docs/USAGE.md) 
 
+<br/>
+
 ### Visualization of assembly and BLAST with Bandage
 
 `Bandage` is a visualization program specifically for *de novo* assembly graphs and accepts the `GFA` generated by `Flye`. Nodes in the graph represent contigs and the connections between the contigs are shown too. Nodes can be labelled according to length, depth or ID. Sequence information can be directly extracted from the graph, which is useful to `BLAST` specific contigs (also built into `Bandage` ).
+
+<br/>
 
 ### Quality assessment of the assembly with MetaQuast
 
@@ -162,6 +193,8 @@ MetaQuast is a genome assembly evaluation tools based on alignment of contigs to
 This is applied to the `filtered_contigs.fa` output of MetaFlye
 
 script `quast.sh`
+
+<br/>
 
 ### Medaka
 
@@ -175,6 +208,9 @@ SRR9648445.fastq  SRR9648446.fastq  all.fastq  assembly.fasta  consensus.fasta  
 ```
 
 script `medaka.sh`
+
+<br/>
+
 
 ### BUSCO
 
